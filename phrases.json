@@ -1,0 +1,19 @@
+{
+    "source": "YABLA",
+    "reference": "Yago - 10 Enfrentamientos - Part 3 of 8",
+    "phrases": [{
+        "seq": 35,
+        "en": "Yours I already have because your grandfather gave it me.",
+        "esCooked": "(Yo)? el tuyo ya lo tengo porque me lo dio tu abuelo.",
+        "esRaw": "Yo el tuyo ya lo tengo porque me lo dio tu abuelo."
+    },{
+        "seq": 74,
+        "en": "Oh, nothing, I don't have any kind of relationship with Roberto Cárdenas.",
+        "esCooked": "Ay, nada, no tengo ninguna clase de relación con Roberto Cardenas.",
+        "esRaw": "Ay, nada, no tengo ninguna clase de relación con Roberto Cárdenas."
+    },{
+        "seq": 80,
+        "en": "It seems like this man goes around doing harm to everyone.",
+        "esRaw": "Parece que este hombre le anda haciendo mal a todo el mundo."
+    }]
+}
