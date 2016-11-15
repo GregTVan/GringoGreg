@@ -1,53 +1,48 @@
 <!DOCTYPE html>
-<html ng-app="canchek">
+<html ng-app="gringogreg">
 <head>
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js'></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
     <style>
         body {font-family: 'Lato'}
-        .jumbotron {
-            background-image: url("http://static.donquijote.org/images/culture/spanish_flag2.jpg");
-            background-size: 100% 100%;}
-        }
     </style>
+    <script>
+        var app = angular.module('gringogreg', []);
+        app.controller('bodyController', function($scope, $http, phraseGetter) { // $http should not be needed here
+            $scope.bar = 'Testing!';
+            $scope.data = [];
+            var promise = phraseGetter.query();
+            $scope.updateTable = function(response) {
+                console.log('got!', response.data);
+                $scope.data = response.data.phrases;
+            promise.then($scope.updateTable); // s/b error handler here
+            }
+        });
+        app.service('phraseGetter', function($http) {
+            this.query = function() {
+                console.log('do query...');
+                return $http({
+                    method: 'GET',
+                    params: {
+                    },
+                    url: 'GringoGreg'
+                })
+            }
+        });        
+    </script>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="jumbotron">
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            gringogreg.com
-        </div>
+    <div ng-controller="bodyController">
+        <table class='table'>
+            <tbody>
+                <tr ng-repeat="d in data">
+                    <td>{{d.en}}</td>
+                    <td>{{d.esCooked}}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </body>
