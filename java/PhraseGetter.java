@@ -6,7 +6,7 @@ public class PhraseGetter {
 	public static Phrases get() {
 		Phrases phrases = null;
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("/tmp/phrases.json"));
+			BufferedReader br = new BufferedReader(new FileReader("webapps/gringogreg/data/phrases.json"));
 			Gson gson = new GsonBuilder().create();
 			phrases = gson.fromJson(br,  Phrases.class);
 			return phrases;

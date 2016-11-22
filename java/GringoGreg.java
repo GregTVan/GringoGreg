@@ -11,8 +11,10 @@ import javax.servlet.http.*;
 @WebServlet("/GringoGreg")
 //@MultipartConfig
 public class GringoGreg extends HttpServlet {
-    
-    public void doGet(HttpServletRequest request, HttpServletResponse response) 
+	
+	private static final long serialVersionUID = 1L;
+	
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
 //        request.setCharacterEncoding("UTF-8");
 //        String searchTerm = request.getParameter("search_term");
