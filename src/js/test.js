@@ -1,27 +1,9 @@
 'use strict';
 
 var React = require('react');
+var Router = require('react-router');
+var routes = require('./routes');
 
-// order matters! Foo must come before Home because Home references Foo
-var Foo = React.createClass({
-    render: function() {
-        return (
-            <span>
-                What the Heck?
-            </span>
-        )
-    }
+Router.run(routes, function(Handler) {
+    React.render(<Handler/>, document.getElementById('app'));
 });
-
-var Home = React.createClass({
-    render: function() {
-        return (
-            <div>
-                Hello World, Hola Mundo !!
-                <Foo/>
-            </div>
-        )
-    }
-});
-
-React.render(<Home />, document.getElementById('app'));
