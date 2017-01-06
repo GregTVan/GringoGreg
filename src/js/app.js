@@ -9,6 +9,7 @@ var App = React.createClass({
         return (
             <div>
                 <Header/>
+                Welcome to gringogreg, my Spanish and React learning site.
                 <RouteHandler/>
             </div>
         )

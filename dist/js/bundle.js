@@ -10,6 +10,7 @@ var App = React.createClass({displayName: "App",
         return (
             React.createElement("div", null, 
                 React.createElement(Header, null), 
+                "Welcome to gringogreg, my Spanish and React learning site.", 
                 React.createElement(RouteHandler, null)
             )
         )
@@ -22,48 +23,26 @@ module.exports = App;
 'use strict';
 
 var React = require('react');
-//var ReactRouter = require('react-router');
-//var Link = ReactRouter.Link;
+var ReactRouter = require('react-router');
+var Link = ReactRouter.Link;
 
 // JSX doesn't like comments (use {/* style, but these look shitty in NP++)
 // JSX demands closing tags
-// navbar-header buttons generate the hamburger but it is currently unresponsive, probably because we aren't including Bootstrap's .js files
+// href instead of link doesn't work, displays directory contents instead of page...
+
+// btw: http://andrewhfarmer.com/react-ajax-best-practices/
 
 var Header = React.createClass({displayName: "Header",
     render: function() {
         return (
-            React.createElement("div", null, 
-            /*<nav className='navbar navbar-inverse navbar-fixed-top'>
-                    <div className='container'>
-                        <div className='navbar-header'>
-                            <button type='button' className='navbar-toggle collapsed' data-toggle='collapse' data-target='#navbar' aria-expanded='false' aria-controls='navbar'>
-                                <span className='sr-only'>Toggle navigation</span>
-                                <span className='icon-bar'></span>
-                                <span className='icon-bar'></span>
-                                <span className='icon-bar'></span>
-                            </button>
-            </div>*/
-                        React.createElement("nav", {className: "navbar navbar-default"}, 
-                            React.createElement("div", {className: "container-fluid"}, 
-                                /*<button type='submit' className='btn btn-success'>Phrases</button>
-                                <button type='submit' className='btn btn-success'>Verbs</button>*/
-                                React.createElement("ul", {className: "nav navbar-nav"}, 
-                                    React.createElement("li", null, 
-                                        React.createElement("a", {href: "/"}, "Home"), 
-                                        React.createElement("a", {href: "/#phrases"}, "Phrases"), 
-                                        React.createElement("a", {href: "/#verbs"}, "Verbs")
-                                    )
-                                )
-                            )
-                        )
-                        /*</div>
-                </nav>
-                <div className='jumbotron'>
-                    <div className='container'>
-                        <h1>gringogreg</h1>
-                        <p>A few things Spanish...</p>
-                    </div>
-                </div>*/
+            React.createElement("nav", {className: "navbar navbar-default"}, 
+                React.createElement("div", {className: "container-fluid"}, 
+                    React.createElement("ul", {className: "nav navbar-nav"}, 
+                        React.createElement("li", null, React.createElement(Link, {to: "/"}, "Home")), 
+                        React.createElement("li", null, React.createElement(Link, {to: "phrases"}, "Phrases")), 
+                        React.createElement("li", null, React.createElement(Link, {to: "verbs"}, "Verbs"))
+                    )
+                )
             )
         )
     }
@@ -71,19 +50,81 @@ var Header = React.createClass({displayName: "Header",
 
 module.exports = Header;
 
-},{"react":201}],3:[function(require,module,exports){
+},{"react":201,"react-router":32}],3:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
 
 var Phrases = React.createClass({displayName: "Phrases",
+
+    getInitialState: function() {
+        return {
+            hello: 'outer container (page)'
+        }
+    },
+    
     render: function() {
         return (
             React.createElement("div", null, 
-                "Hi From Phrases"
+                "Hi, ", this.state.hello, 
+                React.createElement(PhrasesList, {fuck: "asshole"})
             )
         )
     }
+    
+})
+
+var PhrasesList = React.createClass({displayName: "PhrasesList",
+
+    /*var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
+        body: JSON.stringify({
+            action: 'getSignUpConfiguration',
+        }),
+        method: 'POST'
+        // must add CORS header on server...
+        //mode: 'no-cors'
+    })
+    .then(function(response) {
+        console.log('R1t!', response);
+        return response.json();
+    })
+    .then(function(response2) {
+        console.log('R2!');
+        console.log(response2);
+        console.log('complete!');
+    });*/    
+    
+    getInitialState: function() {
+        var that = this;
+        var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
+            body: JSON.stringify({
+                action: 'getSignUpConfiguration',
+            }),
+            method: 'POST'
+        })
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(response) {
+            console.log(response);
+            that.setState({
+                hello: response.planList[0].descriptionLong
+            });
+            console.log('set state done!');
+        });
+        return {
+            hello: 'waiting for server'
+        }
+    },
+    
+    render: function() {
+        return (
+            React.createElement("div", null, 
+                "Hi, ", this.state.hello, " ", this.props.fuck
+            )
+        )
+    }
+    
 })
 
 module.exports = Phrases;
@@ -99,7 +140,7 @@ var Route = Router.Route;
 
 var routes = (
     React.createElement(Route, {name: "app", path: "/", handler: require('./app')}, 
-        React.createElement(DefaultRoute, {handler: require('./phrases')}), 
+        React.createElement(Route, {name: "phrases", handler: require('./phrases')}), 
         React.createElement(Route, {name: "verbs", handler: require('./verbs')})
     )
 );
@@ -112,6 +153,24 @@ module.exports = routes;
 var React = require('react');
 var Router = require('react-router');
 var routes = require('./routes');
+
+/*var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
+    body: JSON.stringify({
+        action: 'getSignUpConfiguration',
+    }),
+    method: 'POST'
+    // must add CORS header on server...
+    //mode: 'no-cors'
+})
+.then(function(response) {
+    console.log('R1t!', response);
+    return response.json();
+})
+.then(function(response2) {
+    console.log('R2!');
+    console.log(response2);
+    console.log('complete!');
+});*/
 
 Router.run(routes, function(Handler) {
     React.render(React.createElement(Handler, null), document.getElementById('app'));
