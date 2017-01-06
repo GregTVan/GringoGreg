@@ -74,26 +74,10 @@ var Phrases = React.createClass({displayName: "Phrases",
     
 })
 
+// is there any way in React to prevent entire component rebuild when flipping between routes?
+
 var PhrasesList = React.createClass({displayName: "PhrasesList",
 
-    /*var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
-        body: JSON.stringify({
-            action: 'getSignUpConfiguration',
-        }),
-        method: 'POST'
-        // must add CORS header on server...
-        //mode: 'no-cors'
-    })
-    .then(function(response) {
-        console.log('R1t!', response);
-        return response.json();
-    })
-    .then(function(response2) {
-        console.log('R2!');
-        console.log(response2);
-        console.log('complete!');
-    });*/    
-    
     getInitialState: function() {
         var that = this;
         var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
