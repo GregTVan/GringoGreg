@@ -22,12 +22,12 @@ var Phrases = React.createClass({
 })
 
 // is there any way in React to prevent entire component rebuild when flipping between routes?
-
+alert('god');
 var PhrasesList = React.createClass({
 
     getInitialState: function() {
         var that = this;
-        var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
+        var d = fetch('http://localhost:3000/getPhrases', {
             body: JSON.stringify({
                 action: 'getSignUpConfiguration',
             }),

@@ -40,7 +40,7 @@ gulp.task('html', function() {
 });
 
 gulp.task('js', function() {
-    browserify('js/test.js')
+    browserify('client/src/js/test.js')
         .transform(reactify)
         .bundle()
         //.on('error', console.error.bind(console))
@@ -64,8 +64,8 @@ gulp.task('open', ['connect'], function() {
 
 // this does work though -- nice!
 gulp.task('watch', function() {
-    gulp.watch('html/*.html', ['html']);
-    gulp.watch('js/*.js', ['js']);
+    gulp.watch('client/src/html/*.html', ['html']);
+    gulp.watch('client/src/js/*.js', ['js']);
     
 });
 
