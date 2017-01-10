@@ -14,7 +14,7 @@ var Phrases = React.createClass({
         return (
             <div>
                 Hi, {this.state.hello}
-                <PhrasesList fuck='asshole'/>
+                <PhrasesList fuck='asshole stretcher'/>
             </div>
         )
     }
@@ -22,15 +22,19 @@ var Phrases = React.createClass({
 })
 
 // is there any way in React to prevent entire component rebuild when flipping between routes?
-alert('god');
+
+var doIt = function() {
+    console.log('oh My!');
+}
+
 var PhrasesList = React.createClass({
 
     getInitialState: function() {
         var that = this;
         var d = fetch('http://localhost:3000/getPhrases', {
-            body: JSON.stringify({
+            /*body: JSON.stringify({
                 action: 'getSignUpConfiguration',
-            }),
+            }),*/
             method: 'POST'
         })
         .then(function(response) {
@@ -39,7 +43,7 @@ var PhrasesList = React.createClass({
         .then(function(response) {
             console.log(response);
             that.setState({
-                hello: response.planList[0].descriptionLong
+                hello: response.sp
             });
             console.log('set state done!');
         });
@@ -48,10 +52,29 @@ var PhrasesList = React.createClass({
         }
     },
     
+    doIt: function() {
+        var d = fetch('http://localhost:3000/saveAnswer', {
+            body: JSON.stringify({
+                pablo: 'escobar'
+            }),
+            // uncommenting this causes Express to not set the CORS header and therefore we get a CORS error
+            headers: new Headers({ 'Content-Type': 'application/json' }),
+            method: 'POST'
+            //mode: 'no-cors'
+        })
+        .then(function(response) {
+            return response.text();
+        })
+        .then(function(response) {
+            console.log(response);
+        });
+    },
+    
     render: function() {
         return (
             <div>
                 Hi, {this.state.hello} {this.props.fuck}
+                <button onClick={this.doIt}>Save Result</button>    
             </div>
         )
     }

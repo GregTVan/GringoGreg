@@ -67,7 +67,7 @@ var Phrases = React.createClass({displayName: "Phrases",
         return (
             React.createElement("div", null, 
                 "Hi, ", this.state.hello, 
-                React.createElement(PhrasesList, {fuck: "asshole"})
+                React.createElement(PhrasesList, {fuck: "asshole stretcher"})
             )
         )
     }
@@ -76,14 +76,18 @@ var Phrases = React.createClass({displayName: "Phrases",
 
 // is there any way in React to prevent entire component rebuild when flipping between routes?
 
+var doIt = function() {
+    console.log('oh My!');
+}
+
 var PhrasesList = React.createClass({displayName: "PhrasesList",
 
     getInitialState: function() {
         var that = this;
-        var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
-            body: JSON.stringify({
+        var d = fetch('http://localhost:3000/getPhrases', {
+            /*body: JSON.stringify({
                 action: 'getSignUpConfiguration',
-            }),
+            }),*/
             method: 'POST'
         })
         .then(function(response) {
@@ -92,7 +96,7 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
         .then(function(response) {
             console.log(response);
             that.setState({
-                hello: response.planList[0].descriptionLong
+                hello: response.sp
             });
             console.log('set state done!');
         });
@@ -101,10 +105,29 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
         }
     },
     
+    doIt: function() {
+        var d = fetch('http://localhost:3000/saveAnswer', {
+            body: JSON.stringify({
+                pablo: 'escobar'
+            }),
+            // uncommenting this causes Express to not set the CORS header and therefore we get a CORS error
+            headers: new Headers({ 'Content-Type': 'application/json' }),
+            method: 'POST'
+            //mode: 'no-cors'
+        })
+        .then(function(response) {
+            return response.text();
+        })
+        .then(function(response) {
+            console.log(response);
+        });
+    },
+    
     render: function() {
         return (
             React.createElement("div", null, 
-                "Hi, ", this.state.hello, " ", this.props.fuck
+                "Hi, ", this.state.hello, " ", this.props.fuck, 
+                React.createElement("button", {onClick: this.doIt}, "Save Result")
             )
         )
     }
@@ -138,7 +161,9 @@ var React = require('react');
 var Router = require('react-router');
 var routes = require('./routes');
 
-/*var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
+/*
+TEST BUNDLER BUNGLER WTF WTG WTH WTI WTJ WTK
+var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
     body: JSON.stringify({
         action: 'getSignUpConfiguration',
     }),

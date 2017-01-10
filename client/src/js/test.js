@@ -4,7 +4,9 @@ var React = require('react');
 var Router = require('react-router');
 var routes = require('./routes');
 
-/*var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
+/*
+TEST BUNDLER BUNGLER WTF WTG WTH WTI WTJ WTK
+var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
     body: JSON.stringify({
         action: 'getSignUpConfiguration',
     }),
