@@ -56,29 +56,16 @@ module.exports = Header;
 var React = require('react');
 
 var Phrases = React.createClass({displayName: "Phrases",
-
-    getInitialState: function() {
-        return {
-            hello: 'outer container (page)'
-        }
-    },
-    
     render: function() {
         return (
             React.createElement("div", null, 
-                "Hi, ", this.state.hello, 
-                React.createElement(PhrasesList, {fuck: "asshole stretcher"})
+                React.createElement(PhrasesList, null)
             )
         )
     }
-    
 })
 
 // is there any way in React to prevent entire component rebuild when flipping between routes?
-
-var doIt = function() {
-    console.log('oh My!');
-}
 
 var PhrasesList = React.createClass({displayName: "PhrasesList",
 
@@ -94,18 +81,16 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
             return response.json();
         })
         .then(function(response) {
-            console.log(response);
             that.setState({
-                hello: response.sp
+                en: response[0].en
             });
-            console.log('set state done!');
         });
         return {
-            hello: 'waiting for server'
+            en: 'waiting for server'
         }
     },
     
-    doIt: function() {
+    sendAnswerGetNewQuestion: function() {
         var d = fetch('http://localhost:3000/saveAnswer', {
             body: JSON.stringify({
                 pablo: 'escobar'
@@ -119,15 +104,21 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
             return response.text();
         })
         .then(function(response) {
-            console.log(response);
+            //console.log(response);
         });
     },
     
     render: function() {
         return (
             React.createElement("div", null, 
-                "Hi, ", this.state.hello, " ", this.props.fuck, 
-                React.createElement("button", {onClick: this.doIt}, "Save Result")
+                "Try translating this phrase:", 
+                React.createElement("div", null, 
+                    this.state.en
+                ), 
+                React.createElement("input", {placeholder: "Type your answer here", type: "text"}), 
+                React.createElement("div", null, 
+                    React.createElement("button", {onClick: this.sendAnswerGetNewQuestion}, "Save Result")
+                )
             )
         )
     }
@@ -161,26 +152,6 @@ var React = require('react');
 var Router = require('react-router');
 var routes = require('./routes');
 
-/*
-TEST BUNDLER BUNGLER WTF WTG WTH WTI WTJ WTK
-var d = fetch('http://localhost/canchek/CanChek?action=getSignUpConfiguration', {
-    body: JSON.stringify({
-        action: 'getSignUpConfiguration',
-    }),
-    method: 'POST'
-    // must add CORS header on server...
-    //mode: 'no-cors'
-})
-.then(function(response) {
-    console.log('R1t!', response);
-    return response.json();
-})
-.then(function(response2) {
-    console.log('R2!');
-    console.log(response2);
-    console.log('complete!');
-});*/
-
 Router.run(routes, function(Handler) {
     React.render(React.createElement(Handler, null), document.getElementById('app'));
 });
@@ -194,7 +165,7 @@ var Verbs = React.createClass({displayName: "Verbs",
     render: function() {
         return (
             React.createElement("div", null, 
-                "Hi From Verbs"
+                "Try translating this verb:"
             )
         )
     }

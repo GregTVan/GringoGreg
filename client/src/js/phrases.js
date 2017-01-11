@@ -3,29 +3,16 @@
 var React = require('react');
 
 var Phrases = React.createClass({
-
-    getInitialState: function() {
-        return {
-            hello: 'outer container (page)'
-        }
-    },
-    
     render: function() {
         return (
             <div>
-                Hi, {this.state.hello}
-                <PhrasesList fuck='asshole stretcher'/>
+                <PhrasesList/>
             </div>
         )
     }
-    
 })
 
 // is there any way in React to prevent entire component rebuild when flipping between routes?
-
-var doIt = function() {
-    console.log('oh My!');
-}
 
 var PhrasesList = React.createClass({
 
@@ -41,18 +28,16 @@ var PhrasesList = React.createClass({
             return response.json();
         })
         .then(function(response) {
-            console.log(response);
             that.setState({
-                hello: response.sp
+                en: response[0].en
             });
-            console.log('set state done!');
         });
         return {
-            hello: 'waiting for server'
+            en: 'waiting for server'
         }
     },
     
-    doIt: function() {
+    sendAnswerGetNewQuestion: function() {
         var d = fetch('http://localhost:3000/saveAnswer', {
             body: JSON.stringify({
                 pablo: 'escobar'
@@ -66,15 +51,21 @@ var PhrasesList = React.createClass({
             return response.text();
         })
         .then(function(response) {
-            console.log(response);
+            //console.log(response);
         });
     },
     
     render: function() {
         return (
             <div>
-                Hi, {this.state.hello} {this.props.fuck}
-                <button onClick={this.doIt}>Save Result</button>    
+                Try translating this phrase:
+                <div>
+                    {this.state.en}
+                </div>
+                <input placeholder='Type your answer here' type='text'></input>
+                <div>
+                    <button onClick={this.sendAnswerGetNewQuestion}>Save Result</button>
+                </div>
             </div>
         )
     }

@@ -2,20 +2,31 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var cors = require('cors');
+var mongo = require('mongodb').MongoClient;
+
+var db;
 
 app.get('/', function(req, res) {
     res.send('hi from Express');
 });
 
-app.post('/getPhrases', function(req, res) {
-    var phrases = {
-        en: 'I hope you know how to read.',
-        sp: 'Espero que sabes leer.'
-    }
-    res.set({
+var reply = function(err, results) {
+    console.log(results);
+    var phrases = results;
+    this.set({
+        'Content-Type': 'application/json;charset=utf-8'
+    })
+    this.set({
         'Access-Control-Allow-Origin': '*'
     })
-    res.send(phrases);
+    console.log('SEND', phrases);
+    this.send(phrases);        
+};
+
+app.post('/getPhrases', function(req, res) {
+    var replyBound = reply.bind(res);
+    var cursor = db.collection('phrases').find().toArray(replyBound);
+    console.log('did query');
 });
 
 app.use(bodyParser.json());
@@ -24,6 +35,12 @@ app.use(cors());
 
 app.post('/saveAnswer', function(req, res) {
     console.log('got an answer of:', req.body, req.params);
+    var t = {
+        'es': 'iré mañana'
+    }
+    db.collection('test').save(t, function(err, result) {
+        console.log(err);
+    });
     //res.set({
         //'Access-Control-Allow-Origin': '*'
     //})
@@ -31,8 +48,15 @@ app.post('/saveAnswer', function(req, res) {
 });
 
 app.listen(3000, function() {
-    console.log('listening on port 3000!');
+    mongo.connect('mongodb://GregTomkins:samft99@ds159978.mlab.com:59978/gringogreg', function (err, database) {
+        console.log(err);
+        console.log('connected to mongo');
+        db = database;
+    });
+    console.log('listening on port 3000');
 });
+
+
 
 /*var express = require('express')
   , bodyParser = require('body-parser');

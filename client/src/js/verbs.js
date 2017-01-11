@@ -6,7 +6,7 @@ var Verbs = React.createClass({
     render: function() {
         return (
             <div>
-                Hi From Verbs
+                Try translating this verb:
             </div>
         )
     }
