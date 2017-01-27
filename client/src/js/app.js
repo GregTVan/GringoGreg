@@ -7,7 +7,7 @@ var Header = require('./header');
 var App = React.createClass({
     render: function() {
         return (
-            <div>
+            <div className='container-fluid'>
                 <Header/>
                 Welcome to gringogreg, my Spanish and React learning site.
                 <RouteHandler/>

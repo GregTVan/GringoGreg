@@ -14,13 +14,11 @@ var Header = React.createClass({
     render: function() {
         return (
             <nav className='navbar navbar-default'>
-                <div className='container-fluid'>
-                    <ul className='nav navbar-nav'>
-                        <li><Link to='/'>Home</Link></li>
-                        <li><Link to='phrases'>Phrases</Link></li>
-                        <li><Link to='verbs'>Verbs</Link></li>
-                    </ul>
-                </div>
+                <ul className='nav navbar-nav'>
+                    <li><Link to='/'>Home</Link></li>
+                    <li><Link to='phrases'>Phrases</Link></li>
+                    <li><Link to='verbs'>Verbs</Link></li>
+                </ul>
             </nav>
         )
     }

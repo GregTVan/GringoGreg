@@ -8,7 +8,7 @@ var Header = require('./header');
 var App = React.createClass({displayName: "App",
     render: function() {
         return (
-            React.createElement("div", null, 
+            React.createElement("div", {className: "container-fluid"}, 
                 React.createElement(Header, null), 
                 "Welcome to gringogreg, my Spanish and React learning site.", 
                 React.createElement(RouteHandler, null)
@@ -36,12 +36,10 @@ var Header = React.createClass({displayName: "Header",
     render: function() {
         return (
             React.createElement("nav", {className: "navbar navbar-default"}, 
-                React.createElement("div", {className: "container-fluid"}, 
-                    React.createElement("ul", {className: "nav navbar-nav"}, 
-                        React.createElement("li", null, React.createElement(Link, {to: "/"}, "Home")), 
-                        React.createElement("li", null, React.createElement(Link, {to: "phrases"}, "Phrases")), 
-                        React.createElement("li", null, React.createElement(Link, {to: "verbs"}, "Verbs"))
-                    )
+                React.createElement("ul", {className: "nav navbar-nav"}, 
+                    React.createElement("li", null, React.createElement(Link, {to: "/"}, "Home")), 
+                    React.createElement("li", null, React.createElement(Link, {to: "phrases"}, "Phrases")), 
+                    React.createElement("li", null, React.createElement(Link, {to: "verbs"}, "Verbs"))
                 )
             )
         )
@@ -77,25 +75,33 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
             }),*/
             method: 'POST'
         })
-        .then(function(response) {
+        .then(function  (response) {
             return response.json();
         })
         .then(function(response) {
             that.setState({
-                en: response[0].en
+                en: response.en
             });
         });
         return {
-            en: 'waiting for server'
+            en: 'waiting for server',
+            es: '',
+            grade: 'waiting for something to happen'
         }
     },
     
+    handleChange: function(e) {
+        this.setState({es: e.target.value});
+    },
+    
     sendAnswerGetNewQuestion: function() {
+        console.log('do saveAnswer HTTP');
         var d = fetch('http://localhost:3000/saveAnswer', {
             body: JSON.stringify({
-                pablo: 'escobar'
+                'en': this.state.en,
+                'es': this.state.es
             }),
-            // uncommenting this causes Express to not set the CORS header and therefore we get a CORS error
+            // uncommenting this causes Express to not set the CORS header and therefore we get a CORS errorasdas   
             headers: new Headers({ 'Content-Type': 'application/json' }),
             method: 'POST'
             //mode: 'no-cors'
@@ -104,7 +110,7 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
             return response.text();
         })
         .then(function(response) {
-            //console.log(response);
+            console.log(response);
         });
     },
     
@@ -115,10 +121,11 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
                 React.createElement("div", null, 
                     this.state.en
                 ), 
-                React.createElement("input", {placeholder: "Type your answer here", type: "text"}), 
+                React.createElement("input", {onChange: this.handleChange, placeholder: "Type your answer here", type: "text"}), 
                 React.createElement("div", null, 
                     React.createElement("button", {onClick: this.sendAnswerGetNewQuestion}, "Save Result")
-                )
+                ), 
+                this.state.grade
             )
         )
     }

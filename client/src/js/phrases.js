@@ -24,25 +24,33 @@ var PhrasesList = React.createClass({
             }),*/
             method: 'POST'
         })
-        .then(function(response) {
+        .then(function  (response) {
             return response.json();
         })
         .then(function(response) {
             that.setState({
-                en: response[0].en
+                en: response.en
             });
         });
         return {
-            en: 'waiting for server'
+            en: 'waiting for server',
+            es: '',
+            grade: 'waiting for something to happen'
         }
     },
     
+    handleChange: function(e) {
+        this.setState({es: e.target.value});
+    },
+    
     sendAnswerGetNewQuestion: function() {
+        console.log('do saveAnswer HTTP');
         var d = fetch('http://localhost:3000/saveAnswer', {
             body: JSON.stringify({
-                pablo: 'escobar'
+                'en': this.state.en,
+                'es': this.state.es
             }),
-            // uncommenting this causes Express to not set the CORS header and therefore we get a CORS error
+            // uncommenting this causes Express to not set the CORS header and therefore we get a CORS errorasdas   
             headers: new Headers({ 'Content-Type': 'application/json' }),
             method: 'POST'
             //mode: 'no-cors'
@@ -51,7 +59,7 @@ var PhrasesList = React.createClass({
             return response.text();
         })
         .then(function(response) {
-            //console.log(response);
+            console.log(response);
         });
     },
     
@@ -62,10 +70,11 @@ var PhrasesList = React.createClass({
                 <div>
                     {this.state.en}
                 </div>
-                <input placeholder='Type your answer here' type='text'></input>
+                <input onChange={this.handleChange} placeholder='Type your answer here' type='text'></input>
                 <div>
                     <button onClick={this.sendAnswerGetNewQuestion}>Save Result</button>
                 </div>
+                {this.state.grade}
             </div>
         )
     }
