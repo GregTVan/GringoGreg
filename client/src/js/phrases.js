@@ -1,5 +1,13 @@
 'use strict';
 
+//var browserHistory = require('react-router').BrowserHistory;
+var xxx = require('react-router');
+var yyy = require('react-router');
+console.log(xxx);
+console.log(yyy);
+var ReactRouter = require('react-router');
+var Link = ReactRouter.Link;
+
 var React = require('react');
 
 var Phrases = React.createClass({
@@ -15,11 +23,13 @@ var Phrases = React.createClass({
 // is there any way in React to prevent entire component rebuild when flipping between routes?
 
 var PhrasesList = React.createClass({
+    
+    mixins: [xxx],
 
     getInitialState: function() {
         var that = this;
         var d = fetch('http://localhost:3000/getPhrases', {
-            /*body: JSON.stringify({
+            /*body: JSON.stringify({aaa
                 action: 'getSignUpConfiguration',
             }),*/
             method: 'POST'
@@ -45,6 +55,8 @@ var PhrasesList = React.createClass({
     
     sendAnswerGetNewQuestion: function() {
         console.log('do saveAnswer HTTP');
+        // WE DO NOT NEED THIS D HERE
+        var that = this;
         var d = fetch('http://localhost:3000/saveAnswer', {
             body: JSON.stringify({
                 'en': this.state.en,
@@ -56,12 +68,19 @@ var PhrasesList = React.createClass({
             //mode: 'no-cors'
         })
         .then(function(response) {
-            return response.text();
+            return response.json();
         })
         .then(function(response) {
-            console.log(response);
+            console.log(response, response.grade);
+            that.setState({
+                en: response.en,
+                grade: response.grade
+            });
         });
     },
+
+    /* Re: Link: tried to change route on onChange event but react-router looks like a real mess;
+       we are on a very old version 0.13.3, current is 3.0.2, several breaking changes between */
     
     render: function() {
         return (
@@ -73,6 +92,7 @@ var PhrasesList = React.createClass({
                 <input onChange={this.handleChange} placeholder='Type your answer here' type='text'></input>
                 <div>
                     <button onClick={this.sendAnswerGetNewQuestion}>Save Result</button>
+                    <button><Link to='phrasesStats'>Show Statz</Link></button>
                 </div>
                 {this.state.grade}
             </div>

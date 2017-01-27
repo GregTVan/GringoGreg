@@ -13,20 +13,6 @@ app.get('/', function(req, res) {
 var phraseBank;
 var currentPhrase = 0;
 
-var reply = function(err, results) {
-    console.log(results);
-    var phrases = results;
-    savePhrases = results;
-    console.log('1', savePhrases);
-    this.set({
-        'Content-Type': 'application/json;charset=utf-8'
-    })
-    this.set({
-        'Access-Control-Allow-Origin': '*'
-    })
-    this.send(phrases);        
-};
-
 app.post('/getPhrases', function(req, res) {
     res.set({
         'Content-Type': 'application/json;charset=utf-8'
@@ -49,7 +35,7 @@ app.post('/saveAnswer', function(req, res) {
         es: req.body.es,
         grade: grade // of THIS question
     }
-    db.collection('test').save(answer, function(err, result) {
+    db.collection('responses').save(answer, function(err, result) {
         console.log(err);
     });
     var newPhrase = getNextPhrase();
