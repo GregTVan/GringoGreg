@@ -49,11 +49,15 @@ var PhrasesList = React.createClass({
         }
     },
 
+    // BUG drops last character or something
+    // BUG doesn't handle pasted data
     handleKeyPress: function(e) {
         if(e.key == 'Enter') {
             this.sendAnswerGetNewQuestion();
         } else {
-            this.setState({es: e.target.value});
+            this.setState({
+                es: e.target.value
+            });
         }
     },
 
@@ -67,14 +71,50 @@ var PhrasesList = React.createClass({
         console.log('wtf', b);
         var d = fetch('http://localhost:3000/saveAnswer', {
             body: JSON.stringify({
-                b
+                'en': this.state.en,
+                'es': this.state.es
             }),
+            //en: 'foo',
+            //es: 'bax',
             // when you add this header it goes as OPTIONS with no payload and returns a 204
-            //headers: new Headers({ 'Content-Type': 'application/json' }),
+            headers: new Headers({ 'Content-Type': 'application/json' }),
             method: 'POST'
         })
-        .then(function  (response) {
+.then(  
+    function(response) {  
+      if (response.status !== 200) {  
+        console.log('Looks like there was a problem. Status Code: ' +  
+          response.status);  
+        return;  
+      }
+
+      // Examine the text in the response  
+      response.json().then(function(data) {  
+        console.log('what i saw', data);  
+            if(data.correct) {
+                document.getElementById('answer').value = '';
+                that.setState({
+                    en: data.en,
+                    grade: 'Correct!'
+                });
+            } else {
+                that.setState({
+                    grade: 'Correct answer is: ' + data.es.expected
+                });
+            }
+        
+      });  
+    }  
+  )  
+  .catch(function(err) {  
+    console.log('Fetch Error :-S', err);  
+  });        
+        
+        /*.then(function  (response) {
             return response.json();
+        })
+        .catch(function(err) {
+            console.log('ERR1', err);
         })
         .then(function(response) {
             if(response.correct) {
@@ -88,7 +128,10 @@ var PhrasesList = React.createClass({
                     grade: 'Correct answer is: ' + response.grade
                 });
             }
-        });
+        })
+        .catch(function(err) {
+            console.log('ERR1', err);
+        });*/
     },
     
     XXXsendAnswerGetNewQuestion: function() {

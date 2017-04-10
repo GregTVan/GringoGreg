@@ -41,6 +41,13 @@ app.use(cors());
 app.post('/saveAnswer', function(req, res) {
     //res.send({"foo": "BAR"});
     //return;
+    res.set({
+        'Content-Type': 'application/json;charset=utf-8'
+    })
+    res.set({
+        'Access-Control-Allow-Origin': '*'
+    })
+    console.log(req.body);
     var grade = getGrade(req.body.en, req.body.es);
     var answer = {
         en: req.body.en,
@@ -51,15 +58,16 @@ app.post('/saveAnswer', function(req, res) {
         // TODO handle error
         //console.log(err, result);
     });
+    console.log(grade);
     var response = {};
     if(grade == 'OK') {
         var newPhrase = getNextPhrase();
         response.en = newPhrase.en;
         response.es = newPhrase.es;
-        correct = true;
+        response.correct = true;
     } else {
         response.es = grade;
-        correct: false;
+        response.correct = false;
     }
     res.send(response);
 });
@@ -74,14 +82,18 @@ var getNextPhrase = function() {
 var getGrade = function(en, es) {
     // TODO handle error (neither string matches), right now just marks wrong
     // TODO handle ES->EN vs EN->ES
+    console.log('here', en, es);
     for(var i=0;i<phraseBank.length;i++) {
         if(en == phraseBank[i].en) {
+            console.log('A: ', es);
+            console.log('B: ', phraseBank[i].es);
             if (es == phraseBank[i].es) return 'OK';
             else return {
                 "expected": phraseBank[i].es
             }
         }
     }
+    return 'ERROR';
 }
 
 var getStats = function(res) {
