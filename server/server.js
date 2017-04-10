@@ -23,12 +23,24 @@ app.post('/getPhrases', function(req, res) {
     res.send(getNextPhrase());
 });
 
+app.post('/getStats', function(req, res) {
+    res.set({
+        'Content-Type': 'application/json;charset=utf-8'
+    })
+    res.set({
+        'Access-Control-Allow-Origin': '*'
+    })
+    //res.send(getStats());
+    getStats(res);
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(cors());
 
 app.post('/saveAnswer', function(req, res) {
-    console.log('in saveanswer');
+    //res.send({"foo": "BAR"});
+    //return;
     var grade = getGrade(req.body.en, req.body.es);
     var answer = {
         en: req.body.en,
@@ -36,14 +48,18 @@ app.post('/saveAnswer', function(req, res) {
         grade: grade // of THIS question
     }
     db.collection('responses').save(answer, function(err, result) {
-        console.log(err);
+        // TODO handle error
+        //console.log(err, result);
     });
-    var newPhrase = getNextPhrase();
-    console.log(newPhrase, currentPhrase);
-    var response = {
-        en: newPhrase.en,
-        es: newPhrase.es,
-        grade: grade // of PREVIOUS question
+    var response = {};
+    if(grade == 'OK') {
+        var newPhrase = getNextPhrase();
+        response.en = newPhrase.en;
+        response.es = newPhrase.es;
+        correct = true;
+    } else {
+        response.es = grade;
+        correct: false;
     }
     res.send(response);
 });
@@ -59,10 +75,27 @@ var getGrade = function(en, es) {
     // TODO handle error (neither string matches), right now just marks wrong
     // TODO handle ES->EN vs EN->ES
     for(var i=0;i<phraseBank.length;i++) {
-        if(en == phraseBank[i].en && es == phraseBank[i].es) return 'OK';
+        if(en == phraseBank[i].en) {
+            if (es == phraseBank[i].es) return 'OK';
+            else return {
+                "expected": phraseBank[i].es
+            }
+        }
     }
-    return 'FAIL';
 }
+
+var getStats = function(res) {
+    //console.log('MADE REQUEST');
+    var cursor2 = db.collection('responses').find().toArray(function (err, results) {
+        // CHECK ERROR
+        res.send({'total': results.length});
+    });
+}
+
+//var handleStatsReply = function(err, results) {
+  //  console.log('GOT REPLY');
+//    console.log(err, results);
+//
 
 var handleReply = function(err, results) {
     // TODO handle err
@@ -71,8 +104,8 @@ var handleReply = function(err, results) {
 
 app.listen(3000, function() {
     mongo.connect('mongodb://GregTomkins:samft99@ds159978.mlab.com:59978/gringogreg', function (err, database) {
-        console.log(err);
-        console.log('connected to mongo');
+        //console.log(err);
+        //console.log('connected to mongo');
         db = database;
         var cursor2 = db.collection('phrases').find().toArray(handleReply);
     });

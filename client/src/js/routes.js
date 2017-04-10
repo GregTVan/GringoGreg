@@ -9,9 +9,9 @@ var Route = Router.Route;
 // wtf capitalization
 var routes = (
     <Route name='app' path='/' handler={require('./app')}>
+        <Route name='home' handler={require('./home')}/>
         <Route name='phrases' handler={require('./phrases')}/>
-        <Route name='phrasesStats' handler={require('./PhrasesStats')}/>
-        <Route name='verbs' handler={require('./verbs')}/>
+        <Route name='stats' handler={require('./stats')}/>
     </Route>
 );
 

@@ -29,9 +29,9 @@ var PhrasesList = React.createClass({
     getInitialState: function() {
         var that = this;
         var d = fetch('http://localhost:3000/getPhrases', {
-            /*body: JSON.stringify({aaa
+            body: JSON.stringify({
                 action: 'getSignUpConfiguration',
-            }),*/
+            }),
             method: 'POST'
         })
         .then(function  (response) {
@@ -43,26 +43,69 @@ var PhrasesList = React.createClass({
             });
         });
         return {
-            en: 'waiting for server',
+            en: 'waiting...',
             es: '',
-            grade: 'waiting for something to happen'
+            grade: 'waiting...'
         }
     },
-    
-    handleChange: function(e) {
-        this.setState({es: e.target.value});
+
+    handleKeyPress: function(e) {
+        if(e.key == 'Enter') {
+            this.sendAnswerGetNewQuestion();
+        } else {
+            this.setState({es: e.target.value});
+        }
+    },
+
+    sendAnswerGetNewQuestion: function() {
+        var that = this;
+        //console.log(this.state.en);
+        var b = JSON.stringify({
+                'en': this.state.en,
+                'es': this.state.es
+            });
+        console.log('wtf', b);
+        var d = fetch('http://localhost:3000/saveAnswer', {
+            body: JSON.stringify({
+                b
+            }),
+            // when you add this header it goes as OPTIONS with no payload and returns a 204
+            //headers: new Headers({ 'Content-Type': 'application/json' }),
+            method: 'POST'
+        })
+        .then(function  (response) {
+            return response.json();
+        })
+        .then(function(response) {
+            if(response.correct) {
+                document.getElementById('answer').value = '';
+                that.setState({
+                    grade: 'Correct!'
+                });
+            } else {
+                that.setState({
+                    en: response.en,
+                    grade: 'Correct answer is: ' + response.grade
+                });
+            }
+        });
     },
     
-    sendAnswerGetNewQuestion: function() {
+    XXXsendAnswerGetNewQuestion: function() {
         console.log('do saveAnswer HTTP');
         // WE DO NOT NEED THIS D HERE
         var that = this;
-        var d = fetch('http://localhost:3000/saveAnswer', {
-            body: JSON.stringify({
-                'en': this.state.en,
-                'es': this.state.es
-            }),
-            // uncommenting this causes Express to not set the CORS header and therefore we get a CORS errorasdas   
+        console.log(this.state.en);
+        console.log(this.state.es);
+        var b = JSON.stringify({
+                'en': 'xxx', //this.state.en,
+                'es': 'yyy' //this.state.es
+            });
+        console.log(b);
+        //var d = fetch('http://localhost:3000/saveAnswer', {
+        var d = fetch('http://localhost:3000/getPhrases', {
+            body: b,
+            // uncommenting this causes Express to not set the CORS header and therefore we get a CORS error
             headers: new Headers({ 'Content-Type': 'application/json' }),
             method: 'POST'
             //mode: 'no-cors'
@@ -72,10 +115,17 @@ var PhrasesList = React.createClass({
         })
         .then(function(response) {
             console.log(response, response.grade);
-            that.setState({
-                en: response.en,
-                grade: response.grade
-            });
+            if(response.correct) {
+                document.getElementById('answer').value = '';
+                that.setState({
+                    grade: 'Correct!'
+                });
+            } else {
+                that.setState({
+                    en: response.en,
+                    grade: 'Correct answer is: ' + response.grade
+                });
+            }
         });
     },
 
@@ -85,15 +135,12 @@ var PhrasesList = React.createClass({
     render: function() {
         return (
             <div>
-                Try translating this phrase:
                 <div>
-                    {this.state.en}
+                    <h1>
+                        {this.state.en}
+                    </h1>
                 </div>
-                <input onChange={this.handleChange} placeholder='Type your answer here' type='text'></input>
-                <div>
-                    <button onClick={this.sendAnswerGetNewQuestion}>Save Result</button>
-                    <button><Link to='phrasesStats'>Show Statz</Link></button>
-                </div>
+                <input className='form-control' id='answer' onKeyPress={this.handleKeyPress} placeholder='Type your answer here then hit Enter/Return' type='text'></input>
                 {this.state.grade}
             </div>
         )

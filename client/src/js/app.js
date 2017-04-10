@@ -9,7 +9,6 @@ var App = React.createClass({
         return (
             <div className='container-fluid'>
                 <Header/>
-                Welcome to gringogreg, my Spanish and React learning site.
                 <RouteHandler/>
             </div>
         )

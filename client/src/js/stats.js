@@ -2,7 +2,7 @@
 
 var React = require('react');
 
-var PhrasesStats = React.createClass({
+var Stats = React.createClass({
 
     //console.log('stats');
     
@@ -43,4 +43,4 @@ var PhrasesStats = React.createClass({
 
 })
 
-module.exports = PhrasesStats;
+module.exports = Stats;

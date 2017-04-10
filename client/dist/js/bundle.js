@@ -2,23 +2,6 @@
 'use strict';
 
 var React = require('react');
-
-var PhrasesStats = React.createClass({displayName: "PhrasesStats",
-    render: function() {
-        return (
-            React.createElement("div", null, 
-                "You're in STATS now"
-            )
-        )
-    }
-})
-
-module.exports = PhrasesStats;
-
-},{"react":202}],2:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
 var RouteHandler = require('react-router').RouteHandler;
 var Header = require('./header');
 
@@ -27,7 +10,6 @@ var App = React.createClass({displayName: "App",
         return (
             React.createElement("div", {className: "container-fluid"}, 
                 React.createElement(Header, null), 
-                "Welcome to gringogreg, my Spanish and React learning site.", 
                 React.createElement(RouteHandler, null)
             )
         )
@@ -36,7 +18,7 @@ var App = React.createClass({displayName: "App",
 
 module.exports = App;
 
-},{"./header":3,"react":202,"react-router":33}],3:[function(require,module,exports){
+},{"./header":2,"react":202,"react-router":33}],2:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -54,9 +36,9 @@ var Header = React.createClass({displayName: "Header",
         return (
             React.createElement("nav", {className: "navbar navbar-default"}, 
                 React.createElement("ul", {className: "nav navbar-nav"}, 
-                    React.createElement("li", null, React.createElement(Link, {to: "/"}, "Home")), 
+                    React.createElement("li", null, React.createElement(Link, {to: "home"}, "Home")), 
                     React.createElement("li", null, React.createElement(Link, {to: "phrases"}, "Phrases")), 
-                    React.createElement("li", null, React.createElement(Link, {to: "verbs"}, "Verbs"))
+                    React.createElement("li", null, React.createElement(Link, {to: "stats"}, "Stats"))
                 )
             )
         )
@@ -65,7 +47,27 @@ var Header = React.createClass({displayName: "Header",
 
 module.exports = Header;
 
-},{"react":202,"react-router":33}],4:[function(require,module,exports){
+},{"react":202,"react-router":33}],3:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+
+var Home = React.createClass({displayName: "Home",
+    render: function() {
+        return (
+            React.createElement("div", null, 
+                "Welcome to GringoGreg.com, my Spanish phrase practice thingamajig.", 
+                React.createElement("br", null), 
+                React.createElement("br", null), 
+                "Click 'Phrases' to practice, 'Stats' to see how you are doing."
+            )
+        )
+    }
+})
+
+module.exports = Home;
+
+},{"react":202}],4:[function(require,module,exports){
 'use strict';
 
 //var browserHistory = require('react-router').BrowserHistory;
@@ -97,9 +99,9 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
     getInitialState: function() {
         var that = this;
         var d = fetch('http://localhost:3000/getPhrases', {
-            /*body: JSON.stringify({aaa
+            body: JSON.stringify({
                 action: 'getSignUpConfiguration',
-            }),*/
+            }),
             method: 'POST'
         })
         .then(function  (response) {
@@ -111,26 +113,69 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
             });
         });
         return {
-            en: 'waiting for server',
+            en: 'waiting...',
             es: '',
-            grade: 'waiting for something to happen'
+            grade: 'waiting...'
         }
     },
-    
-    handleChange: function(e) {
-        this.setState({es: e.target.value});
+
+    handleKeyPress: function(e) {
+        if(e.key == 'Enter') {
+            this.sendAnswerGetNewQuestion();
+        } else {
+            this.setState({es: e.target.value});
+        }
+    },
+
+    sendAnswerGetNewQuestion: function() {
+        var that = this;
+        //console.log(this.state.en);
+        var b = JSON.stringify({
+                'en': this.state.en,
+                'es': this.state.es
+            });
+        console.log('wtf', b);
+        var d = fetch('http://localhost:3000/saveAnswer', {
+            body: JSON.stringify({
+                b
+            }),
+            // when you add this header it goes as OPTIONS with no payload and returns a 204
+            //headers: new Headers({ 'Content-Type': 'application/json' }),
+            method: 'POST'
+        })
+        .then(function  (response) {
+            return response.json();
+        })
+        .then(function(response) {
+            if(response.correct) {
+                document.getElementById('answer').value = '';
+                that.setState({
+                    grade: 'Correct!'
+                });
+            } else {
+                that.setState({
+                    en: response.en,
+                    grade: 'Correct answer is: ' + response.grade
+                });
+            }
+        });
     },
     
-    sendAnswerGetNewQuestion: function() {
+    XXXsendAnswerGetNewQuestion: function() {
         console.log('do saveAnswer HTTP');
         // WE DO NOT NEED THIS D HERE
         var that = this;
-        var d = fetch('http://localhost:3000/saveAnswer', {
-            body: JSON.stringify({
-                'en': this.state.en,
-                'es': this.state.es
-            }),
-            // uncommenting this causes Express to not set the CORS header and therefore we get a CORS errorasdas   
+        console.log(this.state.en);
+        console.log(this.state.es);
+        var b = JSON.stringify({
+                'en': 'xxx', //this.state.en,
+                'es': 'yyy' //this.state.es
+            });
+        console.log(b);
+        //var d = fetch('http://localhost:3000/saveAnswer', {
+        var d = fetch('http://localhost:3000/getPhrases', {
+            body: b,
+            // uncommenting this causes Express to not set the CORS header and therefore we get a CORS error
             headers: new Headers({ 'Content-Type': 'application/json' }),
             method: 'POST'
             //mode: 'no-cors'
@@ -140,10 +185,17 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
         })
         .then(function(response) {
             console.log(response, response.grade);
-            that.setState({
-                en: response.en,
-                grade: response.grade
-            });
+            if(response.correct) {
+                document.getElementById('answer').value = '';
+                that.setState({
+                    grade: 'Correct!'
+                });
+            } else {
+                that.setState({
+                    en: response.en,
+                    grade: 'Correct answer is: ' + response.grade
+                });
+            }
         });
     },
 
@@ -153,15 +205,12 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
     render: function() {
         return (
             React.createElement("div", null, 
-                "Try translating this phrase:", 
                 React.createElement("div", null, 
-                    this.state.en
+                    React.createElement("h1", null, 
+                        this.state.en
+                    )
                 ), 
-                React.createElement("input", {onChange: this.handleChange, placeholder: "Type your answer here", type: "text"}), 
-                React.createElement("div", null, 
-                    React.createElement("button", {onClick: this.sendAnswerGetNewQuestion}, "Save Result"), 
-                    React.createElement("button", null, React.createElement(Link, {to: "phrasesStats"}, "Show Statz"))
-                ), 
+                React.createElement("input", {className: "form-control", id: "answer", onKeyPress: this.handleKeyPress, placeholder: "Type your answer here then hit Enter/Return", type: "text"}), 
                 this.state.grade
             )
         )
@@ -183,15 +232,63 @@ var Route = Router.Route;
 // wtf capitalization
 var routes = (
     React.createElement(Route, {name: "app", path: "/", handler: require('./app')}, 
+        React.createElement(Route, {name: "home", handler: require('./home')}), 
         React.createElement(Route, {name: "phrases", handler: require('./phrases')}), 
-        React.createElement(Route, {name: "phrasesStats", handler: require('./PhrasesStats')}), 
-        React.createElement(Route, {name: "verbs", handler: require('./verbs')})
+        React.createElement(Route, {name: "stats", handler: require('./stats')})
     )
 );
 
 module.exports = routes;
 
-},{"./PhrasesStats":1,"./app":2,"./phrases":4,"./verbs":7,"react":202,"react-router":33}],6:[function(require,module,exports){
+},{"./app":1,"./home":3,"./phrases":4,"./stats":6,"react":202,"react-router":33}],6:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+
+var Stats = React.createClass({displayName: "Stats",
+
+    //console.log('stats');
+    
+    getInitialState: function() {
+        var that = this;
+        var d = fetch('http://localhost:3000/getStats', {
+            /*body: JSON.stringify({aaa
+                action: 'getSignUpConfiguration',
+            }),*/
+            method: 'POST'
+        })
+        .then(function  (response) {
+            console.log(response.json);
+            return response.json();
+        })
+        .then(function(response) {
+            console.log(response);
+            that.setState({
+                en: response.total
+            });
+        });
+        return {
+            en: 'waiting...',
+        }
+        return null;
+    },
+    
+    render: function() {
+        return (
+            React.createElement("div", null, 
+                "Look how many responses you have:", 
+                React.createElement("div", null, 
+                    this.state.en
+                )
+            )
+        )
+    }
+
+})
+
+module.exports = Stats;
+
+},{"react":202}],7:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -202,24 +299,7 @@ Router.run(routes, function(Handler) {
     React.render(React.createElement(Handler, null), document.getElementById('app'));
 });
 
-},{"./routes":5,"react":202,"react-router":33}],7:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-
-var Verbs = React.createClass({displayName: "Verbs",
-    render: function() {
-        return (
-            React.createElement("div", null, 
-                "Try translating this verb:"
-            )
-        )
-    }
-})
-
-module.exports = Verbs;
-
-},{"react":202}],8:[function(require,module,exports){
+},{"./routes":5,"react":202,"react-router":33}],8:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -23075,4 +23155,4 @@ module.exports = warning;
 },{"./emptyFunction":161,"_process":8}],202:[function(require,module,exports){
 module.exports = require('./lib/React');
 
-},{"./lib/React":75}]},{},[6]);
+},{"./lib/React":75}]},{},[7]);
