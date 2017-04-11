@@ -39,7 +39,7 @@ app.use(bodyParser.urlencoded({ extended: true}));
 app.use(cors());
 
 app.post('/saveAnswer', function(req, res) {
-    //res.send({"foo": "BAR"});
+    console.log(req.body);
     //return;
     res.set({
         'Content-Type': 'application/json;charset=utf-8'
@@ -47,18 +47,17 @@ app.post('/saveAnswer', function(req, res) {
     res.set({
         'Access-Control-Allow-Origin': '*'
     })
-    console.log(req.body);
     var grade = getGrade(req.body.en, req.body.es);
     var answer = {
         en: req.body.en,
         es: req.body.es,
-        grade: grade // of THIS question
+        grade: grade,
+        phraseId: req.body.phraseId        // of THIS question
     }
     db.collection('responses').save(answer, function(err, result) {
         // TODO handle error
         //console.log(err, result);
     });
-    console.log(grade);
     var response = {};
     if(grade == 'OK') {
         var newPhrase = getNextPhrase();
@@ -68,6 +67,7 @@ app.post('/saveAnswer', function(req, res) {
     } else {
         response.es = grade;
         response.correct = false;
+        response.errorLocation = 3;
     }
     res.send(response);
 });
@@ -82,11 +82,8 @@ var getNextPhrase = function() {
 var getGrade = function(en, es) {
     // TODO handle error (neither string matches), right now just marks wrong
     // TODO handle ES->EN vs EN->ES
-    console.log('here', en, es);
     for(var i=0;i<phraseBank.length;i++) {
         if(en == phraseBank[i].en) {
-            console.log('A: ', es);
-            console.log('B: ', phraseBank[i].es);
             if (es == phraseBank[i].es) return 'OK';
             else return {
                 "expected": phraseBank[i].es
@@ -99,8 +96,46 @@ var getGrade = function(en, es) {
 var getStats = function(res) {
     //console.log('MADE REQUEST');
     var cursor2 = db.collection('responses').find().toArray(function (err, results) {
+        // count questions and stats
+        var stats = [];
+        var found;
+        for(var i=0;i<results.length;i++) {
+            console.log(results[i]._id, 'LEN: ' + stats.length);
+            found = false;
+            for(var j=0;j<stats.length;j++) {
+                console.log(results[i]._id, stats[j].phraseId);
+                if(results[i].phraseId == stats[j].phraseId) {
+                    found = true;
+                    stats[j].attempted++;
+                    if(results[i].grade == 'OK') {
+                        stats[j].correct++;
+                    }
+                }
+            }
+            if(!found) {
+                var rec = {};
+                rec.phraseId = results[i].phraseId;
+                rec.attempted = 1;
+                rec.correct = 0;
+                if(results[i].grade == 'OK') {
+                    rec.correct++;
+                }
+                rec.en = results[i].en;
+                rec.es = results[i].es;
+                stats.push(rec);
+            }
+        }
+        for(var i=0;i<stats.length;i++) {
+            stats[i].successRate = stats[i].correct / stats[i].attempted;
+            console.log(stats[i].phraseId, stats[i].successRate);
+        }
+        stats.sort(function(a,b) {
+            console.log('sort a', a.phraseId, a.successRate);
+            console.log('sort b', b.phraseId, b.successRate);
+            return (a.successRate > b.successRate) ? 1 : ((a.successRate > b.successRate) ? -1 : 0);
+        });
         // CHECK ERROR
-        res.send({'total': results.length});
+        res.send({'total': results.length, 'details': stats});
     });
 }
 

@@ -8,7 +8,7 @@ var Header = require('./header');
 var App = React.createClass({displayName: "App",
     render: function() {
         return (
-            React.createElement("div", {className: "container-fluid"}, 
+            React.createElement("div", {className: "container-fluid", style: {marginTop:'25px'}}, 
                 React.createElement(Header, null), 
                 React.createElement(RouteHandler, null)
             )
@@ -95,6 +95,8 @@ var Phrases = React.createClass({displayName: "Phrases",
 var PhrasesList = React.createClass({displayName: "PhrasesList",
     
     mixins: [xxx],
+    
+    phraseId: null,
 
     getInitialState: function() {
         var that = this;
@@ -109,13 +111,18 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
         })
         .then(function(response) {
             that.setState({
-                en: response.en
+                en: response.en,
+                phraseId: response._id
             });
+            that.phraseId = response._id;
+                            console.log('Set:', response._id);
+
         });
         return {
             en: 'waiting...',
             es: '',
-            grade: 'waiting...'
+            phraseId: '',
+            grade: ''
         }
     },
 
@@ -136,13 +143,15 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
         //console.log(this.state.en);
         var b = JSON.stringify({
                 'en': this.state.en,
-                'es': this.state.es
+                'es': this.state.es,
+                'phraseId': this.phraseId
             });
         console.log('wtf', b);
         var d = fetch('http://localhost:3000/saveAnswer', {
             body: JSON.stringify({
                 'en': this.state.en,
-                'es': this.state.es
+                'es': this.state.es,
+                phraseId: this.phraseId
             }),
             //en: 'foo',
             //es: 'bax',
@@ -165,11 +174,13 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
                 document.getElementById('answer').value = '';
                 that.setState({
                     en: data.en,
+                    _id: data._id,
                     grade: 'Correct!'
                 });
+                console.log('Saved:', data._id);
             } else {
                 that.setState({
-                    grade: 'Correct answer is: ' + data.es.expected
+                    grade: 'Correct translation: ' + data.es.expected
                 });
             }
         
@@ -248,13 +259,20 @@ var PhrasesList = React.createClass({displayName: "PhrasesList",
     render: function() {
         return (
             React.createElement("div", null, 
+                React.createElement("div", {style: {display:'none'}}, 
+                    this.state.phraseId
+                ), 
                 React.createElement("div", null, 
                     React.createElement("h1", null, 
                         this.state.en
                     )
                 ), 
-                React.createElement("input", {className: "form-control", id: "answer", onKeyPress: this.handleKeyPress, placeholder: "Type your answer here then hit Enter/Return", type: "text"}), 
-                this.state.grade
+                React.createElement("h3", null, 
+                    React.createElement("input", {className: "form-control", id: "answer", onKeyPress: this.handleKeyPress, placeholder: "Type your translation here then hit Enter/Return", style: {marginTop:'25px'}, type: "text"}), 
+                    React.createElement("div", {style: {marginTop:'25px'}}, 
+                        this.state.grade
+                    )
+                )
             )
         )
     }
@@ -288,6 +306,58 @@ module.exports = routes;
 
 var React = require('react');
 
+// from SO
+
+var cols = [
+    { key: 'en', label: 'Phrase' },
+    { key: 'successRate', label: 'Success Rate' }
+];
+
+var data = [
+    { id: 1, firstName: 'John', lastName: 'Doe' },
+    { id: 2, firstName: 'Clark', lastName: 'Kent' }
+];
+
+var Table = React.createClass({displayName: "Table",
+
+    render: function() {
+        var headerComponents = this.generateHeaders(),
+            rowComponents = this.generateRows();
+
+        return (
+            React.createElement("table", {className: "table"}, 
+                React.createElement("thead", null, " ", headerComponents, " "), 
+                React.createElement("tbody", null, " ", rowComponents, " ")
+            )
+        );
+    },
+
+    generateHeaders: function() {
+        var cols = this.props.cols;  // [{key, label}]
+
+        // generate our header (th) cell components
+        return cols.map(function(colData) {
+            return React.createElement("th", {key: colData.key}, " ", colData.label, " ");
+        });
+    },
+
+    generateRows: function() {
+        var cols = this.props.cols,  // [{key, label}]
+            data = this.props.data;
+
+        return data.map(function(item) {
+            // handle the column data within each row
+            var cells = cols.map(function(colData) {
+
+                // colData.key might be "firstName"
+                return React.createElement("td", null, " ", item[colData.key], " ");
+            });
+            return React.createElement("tr", {key: item.id}, " ", cells, " ");
+        });
+    }
+});
+// from SO
+
 var Stats = React.createClass({displayName: "Stats",
 
     //console.log('stats');
@@ -307,22 +377,23 @@ var Stats = React.createClass({displayName: "Stats",
         .then(function(response) {
             console.log(response);
             that.setState({
-                en: response.total
+                en: response.total,
+                stats: response.details
             });
         });
         return {
-            en: 'waiting...',
+            en: 'Retrieving phrases...',
+            stats: []
         }
         return null;
     },
     
     render: function() {
+                /* today/week/month/all time, and, display worst ones */
         return (
             React.createElement("div", null, 
-                "Look how many responses you have:", 
-                React.createElement("div", null, 
-                    this.state.en
-                )
+                "You have attempted ", this.state.en, " translations.", 
+                React.createElement(Table, {cols: cols, data: this.state.stats})
             )
         )
     }

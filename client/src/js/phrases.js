@@ -25,6 +25,8 @@ var Phrases = React.createClass({
 var PhrasesList = React.createClass({
     
     mixins: [xxx],
+    
+    phraseId: null,
 
     getInitialState: function() {
         var that = this;
@@ -39,13 +41,18 @@ var PhrasesList = React.createClass({
         })
         .then(function(response) {
             that.setState({
-                en: response.en
+                en: response.en,
+                phraseId: response._id
             });
+            that.phraseId = response._id;
+                            console.log('Set:', response._id);
+
         });
         return {
             en: 'waiting...',
             es: '',
-            grade: 'waiting...'
+            phraseId: '',
+            grade: ''
         }
     },
 
@@ -66,13 +73,15 @@ var PhrasesList = React.createClass({
         //console.log(this.state.en);
         var b = JSON.stringify({
                 'en': this.state.en,
-                'es': this.state.es
+                'es': this.state.es,
+                'phraseId': this.phraseId
             });
         console.log('wtf', b);
         var d = fetch('http://localhost:3000/saveAnswer', {
             body: JSON.stringify({
                 'en': this.state.en,
-                'es': this.state.es
+                'es': this.state.es,
+                phraseId: this.phraseId
             }),
             //en: 'foo',
             //es: 'bax',
@@ -95,11 +104,13 @@ var PhrasesList = React.createClass({
                 document.getElementById('answer').value = '';
                 that.setState({
                     en: data.en,
+                    _id: data._id,
                     grade: 'Correct!'
                 });
+                console.log('Saved:', data._id);
             } else {
                 that.setState({
-                    grade: 'Correct answer is: ' + data.es.expected
+                    grade: 'Correct translation: ' + data.es.expected
                 });
             }
         
@@ -178,13 +189,20 @@ var PhrasesList = React.createClass({
     render: function() {
         return (
             <div>
+                <div style={{display:'none'}}>
+                    {this.state.phraseId}
+                </div>
                 <div>
                     <h1>
                         {this.state.en}
                     </h1>
                 </div>
-                <input className='form-control' id='answer' onKeyPress={this.handleKeyPress} placeholder='Type your answer here then hit Enter/Return' type='text'></input>
-                {this.state.grade}
+                <h3>
+                    <input className='form-control' id='answer' onKeyPress={this.handleKeyPress} placeholder='Type your translation here then hit Enter/Return' style={{marginTop:'25px'}} type='text'></input>
+                    <div style={{marginTop:'25px'}}>
+                        {this.state.grade}
+                    </div>
+                </h3>
             </div>
         )
     }

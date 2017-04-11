@@ -2,6 +2,58 @@
 
 var React = require('react');
 
+// from SO
+
+var cols = [
+    { key: 'en', label: 'Phrase' },
+    { key: 'successRate', label: 'Success Rate' }
+];
+
+var data = [
+    { id: 1, firstName: 'John', lastName: 'Doe' },
+    { id: 2, firstName: 'Clark', lastName: 'Kent' }
+];
+
+var Table = React.createClass({
+
+    render: function() {
+        var headerComponents = this.generateHeaders(),
+            rowComponents = this.generateRows();
+
+        return (
+            <table className='table'>
+                <thead> {headerComponents} </thead>
+                <tbody> {rowComponents} </tbody>
+            </table>
+        );
+    },
+
+    generateHeaders: function() {
+        var cols = this.props.cols;  // [{key, label}]
+
+        // generate our header (th) cell components
+        return cols.map(function(colData) {
+            return <th key={colData.key}> {colData.label} </th>;
+        });
+    },
+
+    generateRows: function() {
+        var cols = this.props.cols,  // [{key, label}]
+            data = this.props.data;
+
+        return data.map(function(item) {
+            // handle the column data within each row
+            var cells = cols.map(function(colData) {
+
+                // colData.key might be "firstName"
+                return <td> {item[colData.key]} </td>;
+            });
+            return <tr key={item.id}> {cells} </tr>;
+        });
+    }
+});
+// from SO
+
 var Stats = React.createClass({
 
     //console.log('stats');
@@ -21,22 +73,23 @@ var Stats = React.createClass({
         .then(function(response) {
             console.log(response);
             that.setState({
-                en: response.total
+                en: response.total,
+                stats: response.details
             });
         });
         return {
-            en: 'waiting...',
+            en: 'Retrieving phrases...',
+            stats: []
         }
         return null;
     },
     
     render: function() {
+                /* today/week/month/all time, and, display worst ones */
         return (
             <div>
-                Look how many responses you have:
-                <div>
-                    {this.state.en}
-                </div>
+                You have attempted {this.state.en} translations.
+                <Table cols={cols} data={this.state.stats}/>
             </div>
         )
     }
