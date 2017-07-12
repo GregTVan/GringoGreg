@@ -84,7 +84,7 @@ var getGrade = function(en, es) {
     // TODO handle ES->EN vs EN->ES
     console.log('getGrade');
     console.log(en);
-    console.log(es);
+    console.log('\'' + es + '\'');
     console.log(phraseBank);
     for(var i=0;i<phraseBank.length;i++) {
         console.log('SCANNING PHRASEBANK ' + phraseBank[i].en);
@@ -94,7 +94,7 @@ var getGrade = function(en, es) {
                 return 'OK';
             }
             else {
-                console.log('BAD ' + phraseBank[i].es + ' ...' + es.length + ',' + phraseBank[i].es.length);
+                console.log('BAD \'' + phraseBank[i].es + '\' ...' + es.length + ',' + phraseBank[i].es.length);
                 for(var j=0;j<es.length;j++) {
                     console.log(phraseBank[i].es[j] + ' ' + es[j] + (phraseBank[i].es[j] === es[j]));
                 }

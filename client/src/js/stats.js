@@ -67,11 +67,9 @@ var Stats = React.createClass({
             method: 'POST'
         })
         .then(function  (response) {
-            console.log(response.json);
             return response.json();
         })
         .then(function(response) {
-            console.log(response);
             that.setState({
                 en: response.total,
                 stats: response.details

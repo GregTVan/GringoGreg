@@ -3,8 +3,6 @@
 //var browserHistory = require('react-router').BrowserHistory;
 var xxx = require('react-router');
 var yyy = require('react-router');
-console.log(xxx);
-console.log(yyy);
 var ReactRouter = require('react-router');
 var Link = ReactRouter.Link;
 
@@ -45,8 +43,6 @@ var PhrasesList = React.createClass({
                 phraseId: response._id
             });
             that.phraseId = response._id;
-                            console.log('Set:', response._id);
-
         });
         return {
             en: 'waiting...',
@@ -58,13 +54,19 @@ var PhrasesList = React.createClass({
 
     // BUG drops last character or something
     // BUG doesn't handle pasted data
-    handleKeyPress: function(e) {
+    handleChange: function(e) {
         if(e.key == 'Enter') {
             this.sendAnswerGetNewQuestion();
         } else {
             this.setState({
                 es: e.target.value
             });
+        }
+    },
+    
+    handleKeyPress: function(e) {
+        if(e.key == 'Enter') {
+            this.sendAnswerGetNewQuestion();
         }
     },
 
@@ -76,7 +78,6 @@ var PhrasesList = React.createClass({
                 'es': this.state.es,
                 'phraseId': this.phraseId
             });
-        console.log('wtf', b);
         var d = fetch('http://localhost:3000/saveAnswer', {
             body: JSON.stringify({
                 'en': this.state.en,
@@ -99,7 +100,6 @@ var PhrasesList = React.createClass({
 
       // Examine the text in the response  
       response.json().then(function(data) {  
-        console.log('what i saw', data);  
             if(data.correct) {
                 document.getElementById('answer').value = '';
                 that.setState({
@@ -107,7 +107,6 @@ var PhrasesList = React.createClass({
                     _id: data._id,
                     grade: 'Correct!'
                 });
-                console.log('Saved:', data._id);
             } else {
                 var bad = data.es.expected;
                 if(data.errorLocation) {
@@ -202,7 +201,7 @@ var PhrasesList = React.createClass({
                     </h1>
                 </div>
                 <h3>
-                    <input className='form-control' id='answer' onKeyPress={this.handleKeyPress} placeholder='Type your translation here then hit Enter/Return' style={{marginTop:'25px'}} type='text'></input>
+                    <input className='form-control' id='answer' onKeyPress={this.handleKeyPress} onChange={this.handleChange} placeholder='Type your translation here then hit Enter/Return' style={{marginTop:'25px'}} type='text'></input>
                     <div style={{marginTop:'25px'}}>
                         {this.state.grade}
                     </div>
