@@ -19,6 +19,8 @@ var config = {
 
 gulp.task('connect', function() {
     connect.server({
+        // why did we need to define this now and not before???
+        fallback: '../dist/html/index.html',
         root: ['../dist'],
         port: 8005,
         base: 'http://localhost',

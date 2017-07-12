@@ -82,14 +82,31 @@ var getNextPhrase = function() {
 var getGrade = function(en, es) {
     // TODO handle error (neither string matches), right now just marks wrong
     // TODO handle ES->EN vs EN->ES
+    console.log('getGrade');
+    console.log(en);
+    console.log(es);
+    console.log(phraseBank);
     for(var i=0;i<phraseBank.length;i++) {
-        if(en == phraseBank[i].en) {
-            if (es == phraseBank[i].es) return 'OK';
-            else return {
-                "expected": phraseBank[i].es
+        console.log('SCANNING PHRASEBANK ' + phraseBank[i].en);
+        if(en === phraseBank[i].en) {
+            if (es === phraseBank[i].es) {
+                console.log('OK');
+                return 'OK';
             }
+            else {
+                console.log('BAD ' + phraseBank[i].es + ' ...' + es.length + ',' + phraseBank[i].es.length);
+                for(var j=0;j<es.length;j++) {
+                    console.log(phraseBank[i].es[j] + ' ' + es[j] + (phraseBank[i].es[j] === es[j]));
+                }
+                return {
+                    "expected": phraseBank[i].es
+                }
+            }
+        } else {
+            console.log('NO MATCH OUTER: ' + en + ' => ' + phraseBank[i].en);
         }
     }
+    console.log('return error');
     return 'ERROR';
 }
 
@@ -100,10 +117,10 @@ var getStats = function(res) {
         var stats = [];
         var found;
         for(var i=0;i<results.length;i++) {
-            console.log(results[i]._id, 'LEN: ' + stats.length);
+            //console.log(results[i]._id, 'LEN: ' + stats.length);
             found = false;
             for(var j=0;j<stats.length;j++) {
-                console.log(results[i]._id, stats[j].phraseId);
+                //console.log(results[i]._id, stats[j].phraseId);
                 if(results[i].phraseId == stats[j].phraseId) {
                     found = true;
                     stats[j].attempted++;
@@ -127,11 +144,11 @@ var getStats = function(res) {
         }
         for(var i=0;i<stats.length;i++) {
             stats[i].successRate = stats[i].correct / stats[i].attempted;
-            console.log(stats[i].phraseId, stats[i].successRate);
+            //console.log(stats[i].phraseId, stats[i].successRate);
         }
         stats.sort(function(a,b) {
-            console.log('sort a', a.phraseId, a.successRate);
-            console.log('sort b', b.phraseId, b.successRate);
+            //console.log('sort a', a.phraseId, a.successRate);
+            //console.log('sort b', b.phraseId, b.successRate);
             return (a.successRate > b.successRate) ? 1 : ((a.successRate > b.successRate) ? -1 : 0);
         });
         // CHECK ERROR
@@ -147,6 +164,7 @@ var getStats = function(res) {
 var handleReply = function(err, results) {
     // TODO handle err
     phraseBank = results;
+    //console.log(phraseBank);
 }
 
 app.listen(3000, function() {

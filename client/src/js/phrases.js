@@ -109,8 +109,12 @@ var PhrasesList = React.createClass({
                 });
                 console.log('Saved:', data._id);
             } else {
+                var bad = data.es.expected;
+                if(data.errorLocation) {
+                    //bad = bad.substr
+                }
                 that.setState({
-                    grade: 'Correct translation: ' + data.es.expected
+                    grade: 'Correct translation: ' + bad
                 });
             }
         
